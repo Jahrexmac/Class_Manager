@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}
+    <title> Class App</title>
+{% endblock title %}
+
+{% block content %}
+{% block header %}
+    <h1 class="display-3 text-center text-success" >Class Manager</h1>
+{% endblock header %}
+    <p class="lead text-center text-primary" > This Application helps you manage your class</p>
+    <div container>
+        <div class='d-flex flex-column align-items-center'>
+            <p class="h3 col-2 m-2 text-bg-warning rounded-2 text-center"><a href={% url 'class' %} class='text-light'>Go to class</a></p>
+            <p class="h3 col-2 m-2 text-bg-warning rounded-2 text-center"><a href={% url 'newclass' %} class='text-light'> + create class </a></p>
+            <p class="h6 col-2 m-2 text-bg-success rounded-1 text-center"> <a href="" class='text-light'> + create account</a></p>
+            <p class="h6 col-2 m-2 text-bg-success rounded-1 text-center"><a href=""class='text-light'>login</a></p>
+        </div>
+    </div>
+{% endblock content %}
+

@@ -1,0 +1,17 @@
+{% extends "base.html"%}
+{% load crispy_forms_tags %}
+{% block title %}
+    <title> New Student</title>
+{% endblock title %}
+{% block content %}
+    <div>
+            <a href={% url 'class' %} class="btn btn-primary m-3">back to class </a>
+    </div>
+    <div class="">
+            <h2 class="text-center text-success m-2">New Student</h2>
+            <form  action="" method="post" class="text-dark col-3 mx-auto"> {% csrf_token %}
+                {{ form|crispy}}
+                <input type="submit", value="Save" class="btn btn-success m-1">
+            </form>
+    </div>
+{% endblock content %}

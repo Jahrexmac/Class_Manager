@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}
+    <title> Class Room</title>
+{% endblock title %}
+{% block content %}
+<nav class='navbar'>
+    <form class='form-in-line'> 
+        <a href={% url 'newclass' %} class='btn btn-success'>Create Class </a>
+        <a href={% url 'home' %} class='btn btn-warning'>Back</a>
+        <a href='#' class='btn btn-danger'>log out</a>
+    </form>
+</nav>
+{% block header %}
+    <h1 class='display-3 text-center text-success'>My Class Room</h1>
+{% endblock header%}
+<div class='container'>
+    <div class='row'>
+{% for class in classroom_list %}
+   
+        <div class='col-2 m-2 text-bg-warning rounded-3'>
+                <h2 class=" text-center">{{ class.name }}</h2>
+                <p class=" text-primary text-center">{{ class.form_teacher }}</p>
+               <a href={% url 'student' pk=class.pk %} class="btn btn-success  text-light">Go to class</a></button>
+        </div>
+{% empty %}
+    <h5 class='text-danger text-center'> You Currently Don't Have Any Class To Manage </h5>
+    <h5 class='text-danger text-center'> Create A Class To Get Started </h5>
+{% endfor %}
+   </div>
+</div>
+{% endblock content %}
