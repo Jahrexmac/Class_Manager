@@ -90,7 +90,10 @@ class StudentDetails(View):
         for subject in subjects:
             counter += 1
             grand_total += subject.total
-        average = grand_total / counter
+        if grand_total > 0 :
+            average = grand_total / counter
+        else:
+            average = 0.00
         average = f"{average:.2f}"
 
         if float(average) >= 60:
@@ -128,3 +131,12 @@ class StudentRemove(DeleteView):
     template_name='removestudent.html'
     success_url = reverse_lazy('class')
 
+class SubjectNew(CreateView):
+    model = Subject
+    template_name = "subjectnew.html"
+    fields = ["student","name", "first_test", "second_test", "exam"]
+
+class SubjectUpdate(UpdateView):
+    model = Subject
+    template_name = "subjectupdate.html"
+    fields = ["name", "first_test", "second_test", "exam"]

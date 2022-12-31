@@ -37,14 +37,17 @@
         </div>
     </br>
     <div class="form-check">
-        <div class="d-flex">
-            <div class='col-4 bg-primary'>
-                <div class='d-flex row '>
-                    <p class='display-6 text-sucess text-light text-start col-12 '>Academic Performance</p>
+        <div class="d-flex flex-column">
+            <div class='col-12 bg-primary'>
+                <div class='d-flex'>
+                    <p class='display-6 text-sucess text-center text-light text-start col-12 '>Academic Performance</p>
                 </div> 
             </div>
-            <div class='col-8 bg-info'>
-                <div class='d-flex'>
+            <div class=' d-flex col-12 bg-info'>
+                <div class='col-4'>
+                    <a href={% url 'subject' %} class="btn btn-success text-light col-12"><span class='display-6'>Add Subject</span></a>
+                </div>
+                <div class='d-flex col-8'>
                     <div class='d-flex flex-column col-4 '>
                         <p></p>
                         <h4 class='text-light mx-auto'>Class Position: <span class="text-success">1st</span></h4> 
@@ -72,6 +75,7 @@
                     <th scope='col'>Exam</th>
                     <th scope='col'>Total</th>
                     <th scope='col'>Grade</th>
+                    <th scope='col'></th>
                 </tr>
             </thread>
           
@@ -92,6 +96,10 @@
                     <td> {{subject.total}} </td>
                     <td> {{subject.grade}}</td>
                 {% endif %}
+                    <td class='text-light col-2'>
+                        <a href={% url 'subjectupdate' subject.pk %} class="btn btn-warning">Edit</a>
+                        <a href={% url 'subjectupdate' subject.pk %} class="btn btn-danger">Delete</a>
+                    </td>
             {% empty %}
                 <p> No Subject for this Student</p>
             </tbody>
