@@ -5,7 +5,7 @@
 {% endblock title %}
 {% block content %}
     <div>
-        <a href={% url 'class' %} class="btn btn-primary m-3">Back</a>
+        <a href={% url 'student' classroom.pk %} class="btn btn-primary m-3">Back</a>
     </div>
     </div>
     <form  action="" method="post" class="text-dark col-6 mx-auto"> {% csrf_token %}

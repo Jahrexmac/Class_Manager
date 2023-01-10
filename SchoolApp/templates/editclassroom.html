@@ -5,12 +5,12 @@
 {% endblock title %}
 {% block content %}
     <div>
-        <a href={% url 'class' %} class="btn btn-primary m-3">Back</a>
+        <a href='{{ request.META.HTTP_REFERER }}' class="btn btn-primary m-3">Back</a>
     </div>
     </div>
     <h2 class="text-center text-success m-2">Edit Class</h2>
-    <form  action="" method="post" class="text-dark col-3 mx-auto"> {% csrf_token %}
+    <form  action='{{ request.META.HTTP_REFERER }}' method="post" class="text-dark col-3 mx-auto"> {% csrf_token %}
         {{ form|crispy }}
-        <input type="submit", value="Update" class="btn btn-success m-1">
+        <input type="submit", name="update"value="Update" class="btn btn-success m-1">
     </form>
 {% endblock content%}

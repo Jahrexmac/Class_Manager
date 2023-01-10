@@ -5,7 +5,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <div class="head">
-        <a href={% url 'home' %} class="btn btn-primary m-3">Back</a>
+        <a href='{{ request.META.HTTP_REFERER }}' class="btn btn-primary m-3">Back</a>
     </div>
     </div>
     <h2 class="text-center text-success m-2">Create New Class</h2>
