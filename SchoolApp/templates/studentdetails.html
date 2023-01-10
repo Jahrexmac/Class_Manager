@@ -98,10 +98,10 @@
                 {% endif %}
                     <td class='text-light col-2'>
                         <a href={% url 'subjectupdate' subject.pk %} class="btn btn-warning">Edit</a>
-                        <a href={% url 'subjectupdate' subject.pk %} class="btn btn-danger">Delete</a>
+                        <a href={% url 'deletesubject' subject.pk %} class="btn btn-danger">Delete</a>
                     </td>
             {% empty %}
-                <p> No Subject for this Student</p>
+                <h3 class="text-danger"> No subject for this Student please add subjects</h3>
             </tbody>
             {% endfor %}
             

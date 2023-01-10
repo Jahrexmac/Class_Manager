@@ -128,9 +128,11 @@ class StudentDetails(View):
             form = SubjectNewForm(request.POST) #to save subject form
             if form.is_valid():
                 form.save()
-            #print(pk)
-            students = Student.objects.filter(pk=pk) # from data base
-            subjects = Subject.objects.filter(student=pk) # from data base
+            
+            subject = Subject.objects.last() # retrieve last object from the data base
+
+            students = Student.objects.filter(pk= subject.student_id) # from data base
+            subjects = Subject.objects.filter(student= subject.student_id) # from data base
 
             subjects = self.subject_process(subjects) # refine the subjects list of subject object to include total, grade and serial number
         
@@ -182,6 +184,26 @@ class StudentDetails(View):
             students = Student.objects.filter(pk=pk) # from data base
             subjects = Subject.objects.filter(student=pk) # from data base
 
+            subjects = self.subject_process(subjects) # refine the subjects list of subject object to include total, grade and serial number
+        
+            totals = self.subject_total(subjects)
+            #retrieve the class to get the pk so that the back key functionality would work for empty classes
+            classroom = Classroom.objects.filter(name = students[0].student_class) 
+            class_pk = classroom[0].pk
+
+            std_name = students[0].first_name.title() + ' ' + students[0].last_name.title()
+            pk = students[0].pk
+
+            return render(request, 'studentdetails.html', {'students': students, 'name': std_name, 'pk': pk, 'class_pk': class_pk, 'subjects':subjects, 'totals': totals})
+        
+        if 'delete' in str(request.body):
+            subject = Subject.objects.filter(pk = pk)
+
+            students = Student.objects.filter(pk = subject[0].student_id)
+            subjects = Subject.objects.filter(student = subject[0].student_id) # from data base
+
+            Subject.objects.filter(pk = pk ).delete() # deletes the student
+            
             subjects = self.subject_process(subjects) # refine the subjects list of subject object to include total, grade and serial number
         
             totals = self.subject_total(subjects)
@@ -283,3 +305,7 @@ class SubjectUpdate(UpdateView):
     model = Subject
     template_name = "subjectupdate.html"
     fields = ["name", "first_test", "second_test", "exam"]
+
+class SubjectDelete(DeleteView):
+    model = Subject
+    template_name = "subjectdelete.html"

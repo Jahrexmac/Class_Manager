@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}
+    <title> Delete Subject</title>
+{% endblock title %}
+{% block content %}
+    <div>
+        <a href='{{ request.META.HTTP_REFERER }}' class="btn btn-primary m-3">Back</a>
+    </div>
+    </div>
+    <form  action={% url 'studentdetails' subject.pk %} method="post" class="text-dark col-6 mx-auto"> {% csrf_token %}
+        <h2 class=" text-success">Are You Sure You Want To Delete {{subject.name}}?</h2>
+        <div class='d-flex justify-content-center'>
+            <input type="submit", name="delete" value="delete" class="btn btn-danger m-1 col-5">
+        </div>     
+    </form>
+{% endblock content%}

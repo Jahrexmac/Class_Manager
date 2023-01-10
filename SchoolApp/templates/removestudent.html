@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% block title %}
-    <title> Delete Classroom</title>
+    <title>Remove Student</title>
 {% endblock title %}
 {% block content %}
     <div>
         <a href={% url 'studentdetails' student.pk %} class="btn btn-primary m-3">Back</a>
     </div>
     </div>
-    <form  action={% url 'student' student.pk%} method="post" class="text-dark col-6 mx-auto"> {% csrf_token %}
+    <form  action={% url 'student' student.pk %} method="post" class="text-dark col-6 mx-auto"> {% csrf_token %}
         <h2 class=" text-success">Are You Sure You Want To Remove Student?</h2>
         <div class='d-flex justify-content-center'>
             <input type="submit", name='remove' value="remove" class="btn btn-danger m-1 col-5">
