@@ -15,55 +15,87 @@ class ClassListView(ListView):
     model = Classroom
     template_name = "classroom.html"
 
-class StudentListView(View):
-
+# NEW CODE
+class Results(View):
     def get(self, request, pk):
+        '''
+    1. retreive all students
+    2. get thier pk 
+    3. use pk to retreive all subject and store all in a new a array
+    4.process the result
+    
+    '''
+        classroom = Classroom.objects.filter(pk = pk)
+        class_pk = classroom[0].pk
+        print(class_pk)
+        students = Student.objects.filter(student_class = class_pk) # from data base
+        student_pk = students[0].pk
+        sub = 'subject placeholder'
+
+        class_result = StudentDetails.result_display(self,students,sub,student_pk,checker= False)
+        print(class_result)
+        '''
+            the result contain 
+            1. object of results
+            2. object single student
+            3. list of subjects
+        '''
+        #subjects = self.subject_process(subjects) # refine the subjects list of subject object to include total, grade and serial number
+        #return students, std_name, pk, class_pk, subjects and totals
+        return render(request, 'results.html', {'class_result': class_result})
+#END OF NEW CODE
+class StudentListView(View):
+    
+    def get(self, request, pk):
+        num_students = 0
         std = Student.objects.filter(student_class=pk)
         try:
             std_class = std[0].student_class
+            num_students = len(std)
         except IndexError:
             std = Classroom.objects.filter(pk = pk)
             std_class = std[0].name
             class_pk = std[0].pk
-            return render(request, 'students.html', {'class': std_class, 'class_pk': class_pk})
+            num_students = 0
+            return render(request, 'students.html', {'class': std_class, 'class_pk': class_pk, 'num_students': num_students})
         else:
-            return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk,})
+            return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk, 'num_students': num_students})
     def post(self,request,pk):
-
+        num_students = 0
         if 'save' in str(request.body):
             form = StudentNewForm(request.POST) #to save subject form
             if form.is_valid():
                 form.save()
 
-            std = Student.objects.filter(student_class=pk)
-            try:
-                std_class = std[0].student_class
-            except IndexError:
-                std = Classroom.objects.filter(pk = pk)
-                std_class = std[0].name
-                class_pk = std[0].pk
-                return render(request, 'students.html', {'class': std_class, 'class_pk': class_pk})
-            else:
-                return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk,})
+            last_student = Student.objects.last() # retrieve the last student
+            std = Student.objects.filter(student_class=last_student.student_class_id)
+            num_students = len(std)
+            
+            std_class = std[0].student_class
+            pk = last_student.student_class_id
+            return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk, 'num_students': num_students})
 
         if 'remove' in str(request.body):
             student = Student.objects.filter(pk = pk)
 
             classroom = Classroom.objects.filter(name = student[0].student_class)
-
+            std_class = classroom[0].name
             class_pk = classroom[0].pk
             std = Student.objects.filter(student_class=class_pk)
 
             Student.objects.filter(pk = pk ).delete() # deletes the student
             try:
-                std_class = std[0].student_class
+                class_pk = std[0].student_class
+                num_students = len(std)
             except IndexError:
-                std = Classroom.objects.filter(pk = pk)
-                std_class = std[0].name
-                class_pk = std[0].pk
-                return render(request, 'students.html', {'class': std_class, 'class_pk': class_pk})
+                num_students = 0
+                classroom = Classroom.objects.filter(pk = class_pk)
+                print(std)
+                std_class = classroom[0].name
+                class_pk = classroom[0].pk
+                return render(request, 'students.html', {'class': std_class, 'class_pk': class_pk, 'num_students': num_students})
             else:
-                return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk,})
+                return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk, 'num_students': num_students})
       
         if 'update' in str(request.body):
             print('yes')
@@ -77,13 +109,15 @@ class StudentListView(View):
             Student.objects.filter(pk = pk ).delete() # deletes the student
             try:
                 std_class = std[0].student_class
+                num_students = len(std)
             except IndexError:
+                num_students = 0
                 std = Classroom.objects.filter(pk = pk)
                 std_class = std[0].name
                 class_pk = std[0].pk
-                return render(request, 'students.html', {'class': std_class, 'class_pk': class_pk})
+                return render(request, 'students.html', {'class': std_class, 'class_pk': class_pk, 'num_students': num_students})
             else:
-                return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk,})
+                return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk, 'num_students': num_students})
       
 class ClassCreateView(CreateView):
     model = Classroom
@@ -108,21 +142,15 @@ class ClassDelete(DeleteView):
         return reverse('class')
 
 class StudentDetails(View):
+    
     def get(self, request, pk):
         students = Student.objects.filter(pk = pk) # from data base
         subjects = Subject.objects.filter(student=pk) # from data base
 
-        subjects = self.subject_process(subjects) # refine the subjects list of subject object to include total, grade and serial number
-        
-        totals = self.subject_total(subjects)
-        #retrieve the class to get the pk so that the back key functionality would work for empty classes
-        classroom = Classroom.objects.filter(name = students[0].student_class) 
-        class_pk = classroom[0].pk
-
-        std_name = students[0].first_name.title() + ' ' + students[0].last_name.title()
-        pk = students[0].pk
-        return render(request, 'studentdetails.html', {'students': students, 'name': std_name, 'pk': pk, 'class_pk': class_pk, 'subjects':subjects, 'totals': totals})
-    
+        #subjects = self.subject_process(subjects) # refine the subjects list of subject object to include total, grade and serial number
+        #return students, std_name, pk, class_pk, subjects and totals
+        return render(request, 'studentdetails.html',self.result_display(students,subjects,pk, checker=True))
+            
     def post(self,request,pk):
         if 'save' in str(request.body):
             form = SubjectNewForm(request.POST) #to save subject form
@@ -134,18 +162,8 @@ class StudentDetails(View):
             students = Student.objects.filter(pk= subject.student_id) # from data base
             subjects = Subject.objects.filter(student= subject.student_id) # from data base
 
-            subjects = self.subject_process(subjects) # refine the subjects list of subject object to include total, grade and serial number
-        
-            totals = self.subject_total(subjects)
-            #retrieve the class to get the pk so that the back key functionality would work for empty classes
-            classroom = Classroom.objects.filter(name = students[0].student_class) 
-            class_pk = classroom[0].pk
-
-            std_name = students[0].first_name.title() + ' ' + students[0].last_name.title()
-            pk = students[0].pk
-
-            return render(request, 'studentdetails.html', {'students': students, 'name': std_name, 'pk': pk, 'class_pk': class_pk, 'subjects':subjects, 'totals': totals})
-    
+            return render(request, 'studentdetails.html',self.result_display(students,subjects,subject.student_id, checker=True))
+            
         if 'update' in str(request.body):
             subject = Subject.objects.get(pk=pk)
             subject.name = request.POST['name']
@@ -158,17 +176,9 @@ class StudentDetails(View):
             student_pk = students[0].pk
             subjects = Subject.objects.filter(student=student_pk) # from data base
 
-            subjects = self.subject_process(subjects) # refine the subjects list of subject object to include total, grade and serial number
+            return render(request, 'studentdetails.html',self.result_display(students,subjects, student_pk, checker=True))
+
         
-            totals = self.subject_total(subjects)
-            #retrieve the class to get the pk so that the back key functionality would work for empty classes
-            classroom = Classroom.objects.filter(name = students[0].student_class) 
-            class_pk = classroom[0].pk
-
-            std_name = students[0].first_name.title() + ' ' + students[0].last_name.title()
-            pk = students[0].pk
-
-            return render(request, 'studentdetails.html', {'students': students, 'name': std_name, 'pk': pk, 'class_pk': class_pk, 'subjects':subjects, 'totals': totals})
         if 'changes' in str(request.body):
             
             student = Student.objects.get(pk=pk)
@@ -183,40 +193,19 @@ class StudentDetails(View):
 
             students = Student.objects.filter(pk=pk) # from data base
             subjects = Subject.objects.filter(student=pk) # from data base
-
-            subjects = self.subject_process(subjects) # refine the subjects list of subject object to include total, grade and serial number
-        
-            totals = self.subject_total(subjects)
-            #retrieve the class to get the pk so that the back key functionality would work for empty classes
-            classroom = Classroom.objects.filter(name = students[0].student_class) 
-            class_pk = classroom[0].pk
-
-            std_name = students[0].first_name.title() + ' ' + students[0].last_name.title()
-            pk = students[0].pk
-
-            return render(request, 'studentdetails.html', {'students': students, 'name': std_name, 'pk': pk, 'class_pk': class_pk, 'subjects':subjects, 'totals': totals})
-        
+            
+            return render(request, 'studentdetails.html',self.result_display(students,subjects,pk, checker=True))
+              
         if 'delete' in str(request.body):
             subject = Subject.objects.filter(pk = pk)
-
-            students = Student.objects.filter(pk = subject[0].student_id)
-            subjects = Subject.objects.filter(student = subject[0].student_id) # from data base
+            
+            student_pk = subject[0].student_id
+            students = Student.objects.filter(pk = student_pk)
+            subjects = Subject.objects.filter(student = student_pk) # from data base
 
             Subject.objects.filter(pk = pk ).delete() # deletes the student
             
-            subjects = self.subject_process(subjects) # refine the subjects list of subject object to include total, grade and serial number
-        
-            totals = self.subject_total(subjects)
-            #retrieve the class to get the pk so that the back key functionality would work for empty classes
-            classroom = Classroom.objects.filter(name = students[0].student_class) 
-            class_pk = classroom[0].pk
-
-            std_name = students[0].first_name.title() + ' ' + students[0].last_name.title()
-            pk = students[0].pk
-
-            return render(request, 'studentdetails.html', {'students': students, 'name': std_name, 'pk': pk, 'class_pk': class_pk, 'subjects':subjects, 'totals': totals})
-      
-
+            return render(request, 'studentdetails.html',self.result_display(students,subjects,student_pk, checker=True))
 
     def subject_process (self, subjects):
         """
@@ -227,7 +216,7 @@ class StudentDetails(View):
         for subject in subjects:
             serial_num += 1
             total = subject.first_test + subject.second_test + subject.exam
-            grade = self.grade(total)
+            grade = StudentDetails.grade(self, total)
             subject.total = total
             subject.grade = grade
             subject.serial_number = serial_num
@@ -238,23 +227,28 @@ class StudentDetails(View):
         """
             Generate the grand total and average
         """
-        grand_total = 0
-        counter = 0
-        check = False
-        for subject in subjects:
-            counter += 1
-            grand_total += subject.total
-        if grand_total > 0 :
-            average = grand_total / counter
-        else:
-            average = 0.00
+        try:
+            if subjects[0].student_id:
+                student_id = subjects[0].student_id
+                grand_total = 0
+                counter = 0
+                check = False
+                for subject in subjects:
+                    counter += 1
+                    grand_total += subject.total
+                if grand_total > 0 :
+                    average = grand_total / counter
+                else:
+                    average = 0.00
     
-        average = f"{average:.2f}"
+                average = f"{average:.2f}"
 
-        if float(average) >= 60:
-            check = True
-
-        return {'average': float(average), 'grand_total': grand_total, 'check': check}
+                if float(average) >= 60:
+                    check = True
+                return {'average': float(average), 'grand_total': grand_total, 'check': check, 'student_id': student_id, 'position': ''}
+        except IndexError:
+            return {'average': 0.00, 'grand_total': 0, 'check': False, 'student_id': 0, 'position': ''}
+     
 
         # calculate grand total
         # calculate average
@@ -274,7 +268,107 @@ class StudentDetails(View):
             return "B+"
         else:
             return "A"
+
+    def result_display(self,students,subjects,student_pk, checker):
+
+         #retrieve the class to get the pk so that the back key functionality would work for empty classes
+        classroom = Classroom.objects.filter(name = students[0].student_class) 
+        class_pk = classroom[0].pk
+
+#NEW CODE
+        all_students = Student.objects.filter(student_class = class_pk)
+        all_students_totals = []
+        all_processed_subjects = []
+        print(all_students)
+
+        for student in all_students:
+            print(student)
+            student_subjects = Subject.objects.filter(student = student.pk)
+            student_subjects.position = '' # place holder for position
+            processed_subject = StudentDetails.subject_process(self, student_subjects)
+            subject_totals = StudentDetails.subject_total(self, processed_subject)
+            all_processed_subjects.append(processed_subject)
+            all_students_totals.append(subject_totals)
+           
+
+        sorted_totals = StudentDetails.sort_score(self, all_students_totals) # for all student in the class
         
+        results = StudentDetails.student_grader(self, sorted_totals,all_students_totals) # returns all students result
+
+        for result in results: # filter the result to only the student in focus
+            std_name = students[0].first_name.title() + ' ' + students[0].last_name.title()
+            pk = students[0].pk
+            student_id = result['student_id']
+
+            if checker: # if its a single student to build
+                if student_id == student_pk:        
+#END OF NEW CODE
+                    subjects = self.subject_process(subjects)
+                    return {'students': students, 'name': std_name, 'pk': pk, 'class_pk': class_pk, 'subjects':subjects, 'result': result}
+                if student_id == 0: #if no subject for student
+                    print(result)
+                    return {'students': students, 'name': std_name, 'pk': pk, 'class_pk': class_pk, 'subjects':subjects, 'result': result}
+            else: # builds class results
+                class_result = []
+                i = 0
+                while i < len(all_processed_subjects):
+                    j = 0
+                    while j < len(all_processed_subjects):
+                        if results[i]['student_id'] == all_students[j].pk and results[i]['student_id'] == all_processed_subjects[j][0].student_id:
+                            results[i]['name'] = all_students[j]
+                            results[i]['subject'] = all_processed_subjects[j]
+                            class_result.append(results[i]) # groups student to their result and subject
+                        j +=1
+                    i += 1
+                print(class_result)
+                return class_result
+    def sort_score(self, all_students_totals):
+        """
+        Returns the sorted score of all student
+        from the largest to the smallest
+        """
+        i = 0
+        score = []
+        while i < len(all_students_totals):
+            score.append(all_students_totals[i]['grand_total'])
+            i += 1
+        score = sorted(score, reverse=True)
+        return score
+
+    def student_grader(self,sorted_totals,all_students_totals):
+        i = 0
+        graded_student = []
+        students_position = []
+        while i < len(sorted_totals):
+            j = 0
+            while j < len(sorted_totals):
+                if sorted_totals[i] == all_students_totals[j]["grand_total"]:  # check the current grand total against all student
+
+                    if all_students_totals[j]['student_id'] in graded_student:  # check if student have been graded
+                        break
+                    else:
+                        graded_student.append(all_students_totals[j]['student_id'])
+                        all_students_totals[j]['position'] = StudentDetails.position(self, i+1) # Assign position of class
+                        students_position.append(all_students_totals[j])
+
+                j += 1
+            i += 1
+        print(students_position)
+        return students_position
+
+    def position(self,num):
+        """
+        Returns the position of each student
+        """
+        num = str(num)
+        if num.endswith('1') and int(num) != 11:
+            return (f"{num}st")
+        elif num.endswith('2') and int(num) != 12:
+            return (f"{num}nd")
+        elif num.endswith('3') and int(num) != 13:
+            return (f"{num}rd")
+        else:
+            return (f"{num}th")
 class SubjectNewForm(forms.ModelForm):
     class Meta:
         model= Subject
@@ -309,3 +403,4 @@ class SubjectUpdate(UpdateView):
 class SubjectDelete(DeleteView):
     model = Subject
     template_name = "subjectdelete.html"
+

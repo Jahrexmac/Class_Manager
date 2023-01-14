@@ -1,0 +1,77 @@
+{% extends 'base.html'%}
+{% block content %}
+
+<a href='{{ request.META.HTTP_REFERER }}' class='btn btn-warning'>Back</a>
+<a href='#' class='btn btn-danger'>log out</a>
+<a href='#' class='btn btn-success'>Print Result</a>
+<div class='bg-primary m-2'>
+    <div class='d-flex'>
+        <p class='display-6 text-sucess text-center text-light text-start col-12 '>Class Academic Performance</p>
+    </div> 
+</div>
+
+{% for result in class_result%}
+<div class="form-check">
+    <div class="d-flex flex-column">
+        <div class=' d-flex col-12 bg-info'>
+            <div class='col-4'>
+                <p class=" text-light col-12"><span class='display-6'>{{result.name}}</span></p>
+            </div>
+            <div class='d-flex col-8'>
+                <div class='d-flex flex-column col-4 '>
+                    <p></p>
+                    <h4 class='text-light mx-auto'>Class Position: <span class="text-success">{{result.position}}</span></h4> 
+                </div>
+                <div class='d-flex flex-column col-4 '>
+                    <p></p>
+                    <h4 class='text-light mx-auto'>Grand Total:  {% if result.average >= 60 %} <span class="text-success">{{result.grand_total}}</span>{% else %}<span class="text-danger">{{result.grand_total}}</span{% endif %}
+                    </h4> 
+                </div>
+                <div class='d-flex flex-column col-4 '>
+                    <p></p>
+                    <h4 class='text-light mx-auto'>Average(%): {% if result.average >= 60 %} <span class="text-success">{{result.average}}</span>{% else %}<span class="text-danger">{{result.average}}</span{% endif %}
+                    </h4> 
+                </div>
+            </div> 
+        </div>
+    </div>
+    <table class="table">
+        <thread>
+            <tr>
+                <th scope='col'>#</th>
+                <th scope='col'>Subject</th>
+                <th scope='col'>First Test</th>
+                <th scope='col'>Second Test</th>
+                <th scope='col'>Exam</th>
+                <th scope='col'>Total</th>
+                <th scope='col'>Grade</th>
+                <th scope='col'></th>
+            </tr>
+        </thread>
+      
+        {% for subject in result.subject%}
+        <tbody>
+            <th scope='row'>{{subject.serial_number}}</th>
+            <td> {{subject.name}}</td>
+            {% if subject.total < 40 %}
+                <td class='text-danger'> {{subject.first_test}} </td>
+                <td class='text-danger'> {{subject.second_test}} </td>
+                <td class='text-danger'> {{subject.exam}}</td>
+                <td class='text-danger'> {{subject.total}} </td>
+                <td class='text-danger'> {{subject.grade}}</td>
+            {% else %}
+                <td> {{subject.first_test}} </td>
+                <td> {{subject.second_test}} </td>
+                <td> {{subject.exam}}</td>
+                <td> {{subject.total}} </td>
+                <td> {{subject.grade}}</td>
+            {% endif %}
+        </tbody>
+        {% endfor %}
+        
+       
+    </table>
+    
+</div>
+{% endfor %}
+{% endblock content %}
