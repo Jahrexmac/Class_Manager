@@ -1,3 +1,4 @@
+
 from django.shortcuts import render
 from django.views.generic import ListView
 from django.views import View
@@ -5,6 +6,9 @@ from .models import Classroom, Student, Subject
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMixin
 from django.urls import reverse_lazy, reverse
 from django import forms
+import io
+from django.http import FileResponse
+from utilities.result_generator import generate_result_pdf
 
 # Create your views here.
 class Home(View):
@@ -15,7 +19,6 @@ class ClassListView(ListView):
     model = Classroom
     template_name = "classroom.html"
 
-# NEW CODE
 class Results(View):
     def get(self, request, pk):
         '''
@@ -42,8 +45,46 @@ class Results(View):
         '''
         #subjects = self.subject_process(subjects) # refine the subjects list of subject object to include total, grade and serial number
         #return students, std_name, pk, class_pk, subjects and totals
-        return render(request, 'results.html', {'class_result': class_result})
-#END OF NEW CODE
+        return render(request, 'results.html', {'class_result': class_result, 'class_pk': class_pk})
+
+
+#pdf implement
+class ResultPdf(View):
+    def get(self, request, pk):
+
+        
+        '''
+    1. retreive all students
+    2. get thier pk 
+    3. use pk to retreive all subject and store all in a new a array
+    4.process the result
+    
+    '''
+        classroom = Classroom.objects.filter(pk = pk)
+        class_pk = classroom[0].pk
+        students = Student.objects.filter(student_class = class_pk) # from data base
+        student_pk = students[0].pk
+        sub = 'subject placeholder'
+
+        class_result = StudentDetails.result_display(self,students,sub,student_pk,checker= False)
+        print(class_result)
+        '''
+            the result contain 
+            1. object of results
+            2. object single student
+            3. list of subjects
+        '''
+        #subjects = self.subject_process(subjects) # refine the subjects list of subject object to include total, grade and serial number
+        #return students, std_name, pk, class_pk, subjects and totals
+        #print(class_result)
+        buffer = generate_result_pdf(class_result)
+        return FileResponse(buffer, as_attachment=False,filename=f'{class_result[0]["student_class"]}_results.pdf')
+#end pdf implement
+
+
+
+
+
 class StudentListView(View):
     
     def get(self, request, pk):
@@ -220,6 +261,7 @@ class StudentDetails(View):
             subject.total = total
             subject.grade = grade
             subject.serial_number = serial_num
+            subject.remark = StudentDetails.remark(self,grade)
             subject_obj.append(subject)
         return subject_obj
 
@@ -317,11 +359,27 @@ class StudentDetails(View):
                         if results[i]['student_id'] == all_students[j].pk and results[i]['student_id'] == all_processed_subjects[j][0].student_id:
                             results[i]['name'] = all_students[j]
                             results[i]['subject'] = all_processed_subjects[j]
+                            results[i]['student_class'] = classroom[0].name
                             class_result.append(results[i]) # groups student to their result and subject
                         j +=1
                     i += 1
                 print(class_result)
                 return class_result
+    
+    def remark(self,grade):
+        if grade == 'A':
+            return 'Excellent'
+        elif grade == 'B+':
+            return 'Very Good'
+        elif grade == 'B':
+            return 'Good'
+        elif grade == 'C':
+            return 'Credit'
+        elif grade == 'P':
+            return 'Pass'
+        else:
+            return 'Fail'
+        
     def sort_score(self, all_students_totals):
         """
         Returns the sorted score of all student
