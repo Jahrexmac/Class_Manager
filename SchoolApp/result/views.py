@@ -30,13 +30,11 @@ class Results(View):
     '''
         classroom = Classroom.objects.filter(pk = pk)
         class_pk = classroom[0].pk
-        print(class_pk)
         students = Student.objects.filter(student_class = class_pk) # from data base
         student_pk = students[0].pk
         sub = 'subject placeholder'
 
         class_result = StudentDetails.result_display(self,students,sub,student_pk,checker= False)
-        print(class_result)
         '''
             the result contain 
             1. object of results
@@ -67,7 +65,6 @@ class ResultPdf(View):
         sub = 'subject placeholder'
 
         class_result = StudentDetails.result_display(self,students,sub,student_pk,checker= False)
-        print(class_result)
         '''
             the result contain 
             1. object of results
@@ -100,7 +97,7 @@ class StudentListView(View):
             num_students = 0
             return render(request, 'students.html', {'class': std_class, 'class_pk': class_pk, 'num_students': num_students})
         else:
-            return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk, 'num_students': num_students})
+            return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk, 'class_pk': pk, 'num_students': num_students})
     def post(self,request,pk):
         num_students = 0
         if 'save' in str(request.body):
@@ -114,11 +111,10 @@ class StudentListView(View):
             
             std_class = std[0].student_class
             pk = last_student.student_class_id
-            return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk, 'num_students': num_students})
+            return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk, 'class_pk': pk, 'num_students': num_students})
 
         if 'remove' in str(request.body):
             student = Student.objects.filter(pk = pk)
-
             classroom = Classroom.objects.filter(name = student[0].student_class)
             std_class = classroom[0].name
             class_pk = classroom[0].pk
@@ -126,20 +122,19 @@ class StudentListView(View):
 
             Student.objects.filter(pk = pk ).delete() # deletes the student
             try:
-                class_pk = std[0].student_class
+                #class_pk = std[0].student_class
                 num_students = len(std)
             except IndexError:
                 num_students = 0
                 classroom = Classroom.objects.filter(pk = class_pk)
-                print(std)
                 std_class = classroom[0].name
                 class_pk = classroom[0].pk
                 return render(request, 'students.html', {'class': std_class, 'class_pk': class_pk, 'num_students': num_students})
             else:
-                return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk, 'num_students': num_students})
+                return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk, 'class_pk': class_pk, 'num_students': num_students})
       
         if 'update' in str(request.body):
-            print('yes')
+            
             classroom = Classroom.objects.get(pk=pk)
             classroom.form_teacher = request.POST['form_teacher']
             classroom.name = request.POST['name']
@@ -147,7 +142,7 @@ class StudentListView(View):
 
             std = Student.objects.filter(student_class=pk)
 
-            Student.objects.filter(pk = pk ).delete() # deletes the student
+            #Student.objects.filter(pk = pk ).delete() # deletes the student
             try:
                 std_class = std[0].student_class
                 num_students = len(std)
@@ -158,7 +153,7 @@ class StudentListView(View):
                 class_pk = std[0].pk
                 return render(request, 'students.html', {'class': std_class, 'class_pk': class_pk, 'num_students': num_students})
             else:
-                return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk, 'num_students': num_students})
+                return render(request, 'students.html', {'students': std, 'class': std_class, 'pk': pk, 'class_pk': pk, 'num_students': num_students})
       
 class ClassCreateView(CreateView):
     model = Classroom
@@ -170,6 +165,12 @@ class StudentCreateView(CreateView):
     template_name = "studentnew.html"
     fields = ["student_class","first_name","last_name","middle_name","parent_name","parent_phone_number","house_address","religion"]
 
+    def get_form_class(self):
+        path = self.request.get_full_path() 
+        class_pk = path[-2:]
+        modelform = super().get_form_class()
+        modelform.base_fields['student_class'].limit_choices_to = {'pk': int(class_pk)}
+        return modelform
 class ClassUpdate(UpdateView):
     model = Classroom
     template_name = 'editclassroom.html'
@@ -321,10 +322,8 @@ class StudentDetails(View):
         all_students = Student.objects.filter(student_class = class_pk)
         all_students_totals = []
         all_processed_subjects = []
-        print(all_students)
 
         for student in all_students:
-            print(student)
             student_subjects = Subject.objects.filter(student = student.pk)
             student_subjects.position = '' # place holder for position
             processed_subject = StudentDetails.subject_process(self, student_subjects)
@@ -348,7 +347,6 @@ class StudentDetails(View):
                     subjects = self.subject_process(subjects)
                     return {'students': students, 'name': std_name, 'pk': pk, 'class_pk': class_pk, 'subjects':subjects, 'result': result}
                 if student_id == 0: #if no subject for student
-                    print(result)
                     return {'students': students, 'name': std_name, 'pk': pk, 'class_pk': class_pk, 'subjects':subjects, 'result': result}
             else: # builds class results
                 class_result = []
@@ -363,7 +361,6 @@ class StudentDetails(View):
                             class_result.append(results[i]) # groups student to their result and subject
                         j +=1
                     i += 1
-                print(class_result)
                 return class_result
     
     def remark(self,grade):
@@ -411,7 +408,6 @@ class StudentDetails(View):
 
                 j += 1
             i += 1
-        print(students_position)
         return students_position
 
     def position(self,num):
@@ -441,8 +437,8 @@ class StudentNewForm(forms.ModelForm):
 class StudentUpdate(UpdateView):
     model = Student
     template_name = 'updatestudent.html'
-    fields = ["student_class","first_name","last_name","middle_name","parent_name","parent_phone_number","house_address","religion"]
-
+    fields = ["first_name","last_name","middle_name","parent_name","parent_phone_number","house_address","religion"]
+#"student_class",
 class StudentRemove(DeleteView):
     model = Student
     template_name='removestudent.html'
@@ -453,6 +449,14 @@ class SubjectNew(CreateView):
     template_name = "subjectnew.html"
     fields = ["student","name", "first_test", "second_test", "exam"]
 
+#  To limit the student field to the current field
+    def get_form_class(self):
+        path = self.request.get_full_path() 
+        std_pk = path[-2:]
+        modelform = super().get_form_class()
+        modelform.base_fields['student'].limit_choices_to = {'pk': int(std_pk)}
+        return modelform
+
 class SubjectUpdate(UpdateView):
     model = Subject
     template_name = "subjectupdate.html"
@@ -462,3 +466,5 @@ class SubjectDelete(DeleteView):
     model = Subject
     template_name = "subjectdelete.html"
 
+
+# BACK FUNCTIONALITY FOR NEW STUDENT 

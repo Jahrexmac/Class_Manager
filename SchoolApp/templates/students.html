@@ -8,7 +8,7 @@
 {% block content %}
 <nav class='navbar'>
     <form class='form-in-line'> 
-        <a href={% url 'newstudent' %} class='btn btn-success'>Add Student </a>
+        <a href={% url 'newstudent' class_pk %} class='btn btn-success'>Add Student </a>
         {% if pk %}
             <a href={% url 'class' %} class='btn btn-warning'>Back</a>
             <a href={% url 'editclass' pk %} class='btn btn-info'>Update Class Info</a>
