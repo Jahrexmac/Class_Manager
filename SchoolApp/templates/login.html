@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}
+    <title>Login</title>
+{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="head">
+        <h1 class="text-white text-center m-5 bg-secondary" >Log in</h1>
+        <form  action='' method="post" class="text-dark col-3 mx-auto"> {% csrf_token %}
+         
+
+            <div>
+                <label class"inline-block">Username</label><br>
+                {{ form.username}}
+            </div>
+
+            <div>
+                <label class"inline-block">Password</label><br>
+                {{ form.password}}
+            </div>
+
+
+            {% if form.errors or form.non_field_errors %}
+
+                <div>
+                    {% for field in form %}
+                        {{ field.errors }}
+                    {% endfor %}
+
+                    {{ form.non_field_errors }}
+                </div>
+                
+            {% endif %}
+            <div class='d-flex'>
+                <p class='col-2  m-2'><input type="submit", name='Login' value="Login" class="btn btn-success mx-auto"></p>
+                <p class="h6 col-3 m-2 text-center"> <a href={% url 'signup' %} class='text-light btn btn-primary'>Signup</a></p>
+            </div>
+            </form>
+
+    </div>
+{% endblock content %}
+        

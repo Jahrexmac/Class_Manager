@@ -80,7 +80,7 @@ def result_display(students,subjects,student_pk, checker):
            
 
     sorted_totals = sort_score(all_students_totals) # for all student in the class
-        
+
     results = student_grader(sorted_totals,all_students_totals) # returns all students result
 
     for result in results: # filter the result to only the student in focus
@@ -96,18 +96,22 @@ def result_display(students,subjects,student_pk, checker):
                 return {'students': students, 'name': std_name, 'pk': pk, 'class_pk': class_pk, 'subjects':subjects, 'result': result}
         else: # builds class results
             class_result = []
-            i = 0
-            while i < len(all_processed_subjects):
-                j = 0
-                while j < len(all_processed_subjects):
-                    if results[i]['student_id'] == all_students[j].pk and results[i]['student_id'] == all_processed_subjects[j][0].student_id:
-                        results[i]['name'] = all_students[j]
-                        results[i]['subject'] = all_processed_subjects[j]
-                        results[i]['student_class'] = classroom[0].name
-                        class_result.append(results[i]) # groups student to their result and subject
-                    j +=1
-                i += 1
-            return class_result
+            if results:
+                i = 0
+                while i < len(results):
+                    j = 0
+                    while j < len(all_students):
+
+                        if results[i]['student_id'] == all_students[j].pk and results[i]['student_id'] == all_processed_subjects[j][0].student_id:
+                            results[i]['name'] = all_students[j]
+                            results[i]['subject'] = all_processed_subjects[j]
+                            results[i]['student_class'] = classroom[0].name
+                            class_result.append(results[i]) # groups student to their result and subject
+                        j +=1
+                    i += 1
+                return class_result
+            else:
+                return class_result
     
 def remark(grade):
     if grade == 'A':

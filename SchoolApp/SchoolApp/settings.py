@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,6 +28,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+LOGIN_URL='login'
+LOGIN_REDIRECT_URL= 'home'
+LOGOUT_REDIRECT_URL= '/'
+
 
 # Application definition
 
@@ -42,6 +47,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     #Local apps
     'result.apps.ResultConfig',
+    #'accounts.apps.AccountsConfig',
 ]
 
 MIDDLEWARE = [
@@ -104,6 +110,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+#AUTH_USER_MODEL = "accounts.CustomUser"
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -122,6 +130,12 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR/"static"]
+
+# base url to save media
+MEDIA_URL = '/media/'
+
+# path where media is stored
+MEDIA_ROOT = os.path.join(BASE_DIR,'static/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

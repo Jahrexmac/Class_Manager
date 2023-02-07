@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}
+    <title>Sign up</title>
+{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="head">
+        <h1 class="text-white text-center m-5 bg-secondary" >Sign Up</h1>
+        <form  action='' method="post" class="text-dark col-3 mx-auto form-in-line"> {% csrf_token %}
+         
+
+            <div>
+                <label class"inline-block">Username</label><br>
+                {{ form.username}}
+            </div>
+
+            <div>
+                <label class"inline-block">Email</label><br>
+                {{ form.email}}
+            </div>
+
+            <div>
+                <label class"inline-block">Password</label><br>
+                {{ form.password1}}
+            </div>
+
+            <div>
+                <label class"inline-block">Confirm Password</label><br>
+                {{ form.password2}}
+            </div>
+
+            {% if form.errors or form.non_field_errors %}
+
+                <div>
+                    {% for field in form %}
+                        {{ field.errors }}
+                    {% endfor %}
+
+                    {{ form.non_field_errors }}
+                </div>
+                
+            {% endif %}
+            <input type="submit", name='submit' value="submit" class="btn btn-success m-1 mx-auto">
+        </form>
+
+    </div>
+{% endblock content %}
+        

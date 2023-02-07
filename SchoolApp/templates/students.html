@@ -14,18 +14,17 @@
             <a href={% url 'editclass' pk %} class='btn btn-info'>Update Class Info</a>
             <a href={% url 'deleteclass' pk %} class='btn btn-danger'>Delete Class</a>
             <a href={% url 'results' pk %} class='btn btn-secondary'>Generate Class Result</a>
-            <a href='#' class='btn btn-danger'>log out</a>
+            <a href={% url 'logout' %} class='btn btn-danger'>log out</a>
         {% else %}
             <a href={% url 'class' %} class='btn btn-warning'>Back</a>
             <a href={% url 'editclass' class_pk %} class='btn btn-info'>Update Class Info</a>
             <a href={% url 'deleteclass' class_pk %} class='btn btn-danger'>Delete Class</a>
-            <a href='#' class='btn btn-danger'>log out</a>
+            <a href={% url 'logout' %} class='btn btn-danger'>log out</a>
         {% endif %}
     </form>
 </nav>
 {% block header %}
     <h1 class="text-success text-center"> Welcome to {{class}} </h1>
-    <h6 class="text-primary">Total number of student(s) in class is {{num_students}}</h6>
 {% endblock header %}
 <div class="d-flex">
     <div class="container col-7 "> 
@@ -35,23 +34,27 @@
             <div class="card col-3 ">
                 <div class='row card-img-top justify-content-center'>
                     <div class='col-6'>
-                        <img class=" img-fluid rounded-circle" src= "{% static 'images/me.jpg' %}" alt="Card img cap">
+                        <img class=" img-fluid rounded-circle" src="{% static student.profile_picture %}"  alt="Card img cap">
                     </div>
                 </div>
                 <div class="card-body ">
                     <h6 class="card-title">{{ student}}</h6>
-                    <p class='class-text'>this is a student of this class</p>
+                    
                     <a href={% url 'studentdetails' student.pk %} class='btn btn-primary'>view student details</a>
                 </div> 
             </div>  
             {% empty %}
-            <h5 class='text-danger text-center'> No Student Currently In This Class </h5>
-            <h5 class='text-danger text-center'> Add Student To Class</h5>
+                <h5 class='text-danger text-center'> No Student Currently In This Class </h5>
+                <h5 class='text-danger text-center'> Add Student To Class</h5>
             {% endfor %}
         </div>
     </div>
     <div class="col-5 bg-primary">
         <h4 class="text-center text-light">Class Activities</h4>
     </div>
+</div>
+<br>
+<div>
+    <h5 class="text-white text-center m-2 bg-secondary col-3">{{num_students}} student(s)</h5>
 </div>
 {% endblock content %}

@@ -1,8 +1,10 @@
 from django.db import models
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Classroom(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default='')
     name = models.CharField(max_length=10)
     form_teacher = models.CharField(max_length=50)
 
@@ -22,6 +24,7 @@ class Student(models.Model):
     parent_phone_number = models.CharField(max_length=11)
     house_address = models.CharField(max_length=200)
     religion = models.CharField(max_length=15)
+    profile_picture = models.ImageField(upload_to='images', default='')
     
 
     def __str__(self):

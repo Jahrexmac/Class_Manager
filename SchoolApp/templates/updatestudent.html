@@ -9,7 +9,7 @@
     </div>
     </div>
     <h2 class="text-center text-success m-2">Update Student Info </h2>
-    <form  action={% url 'studentdetails' student.pk %}  method="post" class="text-dark col-3 mx-auto"> {% csrf_token %}
+    <form  action={% url 'studentdetails' student.pk %}  method="post" class="text-dark col-3 mx-auto" enctype="multipart/form-data"> {% csrf_token %}
         {{ form|crispy }}
         <input type="submit", name= "changes" value="add changes" class="btn btn-success m-1">
     </form>

@@ -1,8 +1,10 @@
 from django.urls import path
-from .views import ClassListView, StudentListView, Home, ClassCreateView, StudentCreateView, ClassUpdate, ClassDelete, StudentDetails, StudentUpdate, StudentRemove, SubjectNew, SubjectUpdate, SubjectDelete, Results, ResultPdf
-
+from django.contrib.auth import views as auth_views
+from .views import ClassListView, StudentListView, Home, ClassCreateView, StudentCreateView, ClassUpdate, ClassDelete, StudentDetails, StudentUpdate, StudentRemove, SubjectNew, SubjectUpdate, SubjectDelete, Results, ResultPdf, signup, Index, logout_view
+from .forms import LoginForm
 urlpatterns = [
-    path('', Home.as_view(), name='home'),
+    path('class_space', Home.as_view(), name='home'),
+    path('', Index.as_view(), name='index'),
     path('class', ClassListView.as_view(), name='class'),
     path('student/<int:pk>', StudentListView.as_view(), name='student'),
     path('class/new', ClassCreateView.as_view(), name='newclass'),
@@ -17,8 +19,8 @@ urlpatterns = [
     path('subject/<int:pk>/delete', SubjectDelete.as_view(), name='deletesubject' ),
     path('results/<int:pk>/', Results.as_view(), name='results' ),
     path('result/<int:pk>/pdf', ResultPdf.as_view(), name='result_pdf' ),
+    path('signup/', signup, name='signup'),
+    path('logout/', logout_view, name='logout'),
+    path('login/', auth_views.LoginView.as_view(template_name='login.html', authentication_form=LoginForm), name='login'),
     
-    # path to delete student
-    
-
 ]

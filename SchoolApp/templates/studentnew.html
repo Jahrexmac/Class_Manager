@@ -9,7 +9,7 @@
     </div>
     <div class="">
             <h2 class="text-center text-success m-2">New Student</h2>
-            <form  action='{{ request.META.HTTP_REFERER }}' method="post" class="text-dark col-3 mx-auto"> {% csrf_token %}
+            <form  action='{{ request.META.HTTP_REFERER }}' method="post" class="text-dark col-3 mx-auto" enctype="multipart/form-data"> {% csrf_token %}
                 {{ form|crispy}}
                 <input type="submit", name="save "value="Save" class="btn btn-success m-1">
             </form>
