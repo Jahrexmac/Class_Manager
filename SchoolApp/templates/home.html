@@ -11,7 +11,7 @@
         <img class=" card-img img-responsive" style='height: 600px' src="{% static 'images/apple.jpg' %}"  alt="Card img cap">
         <div class='card-img-overlay'>
             <div class="row d-flex">
-                <h1 class="display-3 text-white card-text col-11" >Class Manager</h1>
+                <h1 class="display-3 text-white card-text col-11" >Class Manager <i class='fas fa-pen-alt'></i> </h1>
                 <p class="col-1"><a href={% url 'logout' %} class='text-light btn btn-danger'>logout</a></p>
             </div>
             <br>
@@ -23,10 +23,10 @@
                 <div class='col-3'>
                 </div>
                 <div class="col-9">
-                    <div class='d-flex flex-column align-items-center'>
-                        <h5 class="text-center text-white card-text" > Welcome {{ request.user }}</h5>
-                        <a href={% url 'class' %} class='text-light btn btn-warning col-3 m-2'><h3>Go to class</h3></a>
-                        <a href={% url 'newclass' %} class='text-light btn btn-success col-3'> <h3>+ create class</h3> </a>
+                    <div class='d-flex flex-column align-items-center'> 
+                        <h5 class="text-white text-center card-text col-3" ><i class='far fa-user fa-lg'></i> Welcome {{ request.user }}</h5>
+                        <a href={% url 'class' %} class='text-light btn btn-warning col-3 m-2'><h3><i class='fas fa-arrow-right text-success fa-3'></i> Go to class</h3></a>
+                        <a href={% url 'newclass' %} class='text-light btn btn-success col-3'><h3><i class='fas fa-plus fa-3 text-warning'></i>     create class</h3> </a>
                     </div>
                 </div>
             </div>

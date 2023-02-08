@@ -5,7 +5,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <div class="head">
-        <h1 class="text-white text-center m-5 bg-secondary" >Sign Up</h1>
+        <h1 class="text-white text-center m-5 bg-primary" >Sign Up</h1>
         <form  action='' method="post" class="text-dark col-3 mx-auto form-in-line"> {% csrf_token %}
          
 
@@ -40,7 +40,11 @@
                 </div>
                 
             {% endif %}
-            <input type="submit", name='submit' value="submit" class="btn btn-success m-1 mx-auto">
+            <div class='d-flex flex-column'>
+                <input type="submit", name='submit' value="submit" class="btn btn-success text-center mx-auto col-8 m-2">
+                <p>have an account?  <a href={% url 'login' %} >Login</a></p>
+            </div>
+            
         </form>
 
     </div>
